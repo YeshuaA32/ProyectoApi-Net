@@ -13,5 +13,6 @@ namespace ApiPeliculas.Data
         //Aqui pasar todas las entidades (modelos)
         public DbSet<Categoria> Categorias { get; set; }
         public DbSet<Pelicula> Pelicula { get; set; }
+        public DbSet<Usuario> Usuario { get; set; }
     }
 }
