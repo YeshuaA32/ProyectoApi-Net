@@ -161,7 +161,52 @@ namespace ApiPeliculas.Controllers
             return NoContent();
         }
 
+        [HttpGet("GetPeliculasEnCategorias/{categoriaId:int}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public IActionResult GetPeliculasEnCategorias(int categoriaId)
+        {
+           var listaPeliculas = _pelRepo.GetPeliculasEnCategoria(categoriaId);
+
+            if (listaPeliculas == null)
+            {
+                return NotFound();
+                
+            }
+            var itemPeliculas= new List<PeliculaDto>();
+            foreach (var pelicula in listaPeliculas)
+            {
+                itemPeliculas.Add(_mapper.Map<PeliculaDto>(pelicula));
+            }
+
+            return Ok(itemPeliculas);
+        }
 
 
+
+
+
+        [HttpGet("Buscar")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public IActionResult Buscar(string nombre)
+        {
+            try
+            {
+                var resultados= _pelRepo.BuscarPelicula(nombre);
+                if (resultados.Any())
+                {
+                    return Ok(resultados);
+                }
+                return NotFound();
+            }
+            catch (Exception ) 
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "Error recuperando datos");
+            }
+
+        }
     }
 }
