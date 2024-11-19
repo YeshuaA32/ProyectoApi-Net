@@ -97,8 +97,69 @@ namespace ApiPeliculas.Controllers
 
 
 
+        [HttpPatch("{peliculaId:int}", Name = "ActualizarPatchPelicula")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        public IActionResult ActualizarPatchPelicula(int peliculaId, [FromBody] PeliculaDto peliculaDto)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+
+            }
+            if (peliculaDto == null || peliculaId != peliculaDto.id)
+            {
+                return BadRequest(ModelState);
+            }
+            var peliculaExistente = _pelRepo.GetPelicula(peliculaId);
+            if (peliculaExistente == null)
+            {
+                return NotFound($"No se encontro la pelicula con Id {peliculaExistente}");
+            }
+
+            var pelicula = _mapper.Map<Pelicula>(peliculaDto);
+
+            if (!_pelRepo.ActualizarPelicula(pelicula))
+            {
+                ModelState.AddModelError("", $"Algo salio mal actualizando el registro{pelicula.Nombre}");
+                return StatusCode(500, ModelState);
+            }
+
+            return NoContent();
+        }
 
 
+
+
+
+
+
+        [HttpDelete("{peliculaId:int}", Name = "BorrarPelicula")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public IActionResult BorrarPelicula(int peliculaId)
+        {
+
+
+            if (!_pelRepo.ExistePelicula(peliculaId))
+            {
+                return NotFound();
+            }
+
+            var pelicula   = _pelRepo.GetPelicula(peliculaId);
+
+            if (!_pelRepo.BorrarPelicula(pelicula))
+            {
+                ModelState.AddModelError("", $"Algo salio mal borrando el registro{pelicula.Nombre}");
+                return StatusCode(500, ModelState);
+            }
+
+            return NoContent();
+        }
 
 
 
