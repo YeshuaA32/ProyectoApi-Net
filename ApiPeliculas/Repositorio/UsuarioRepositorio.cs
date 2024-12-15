@@ -1,7 +1,11 @@
-﻿using ApiPeliculas.Data;
+﻿using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Text;
+using ApiPeliculas.Data;
 using ApiPeliculas.Modelos;
 using ApiPeliculas.Modelos.Dtos;
 using ApiPeliculas.Repositorio.IRepositorio;
+using Microsoft.IdentityModel.Tokens;
 using XSystem.Security.Cryptography;
 
 namespace ApiPeliculas.Repositorio
@@ -9,9 +13,11 @@ namespace ApiPeliculas.Repositorio
     public class UsuarioRepositorio : IUsuarioRepositorio
     {
         private readonly ApplicationDbContext _bd;
-        public UsuarioRepositorio(ApplicationDbContext bd)
+        private string claveSecreta;
+        public UsuarioRepositorio(ApplicationDbContext bd, IConfiguration config)
         {
             _bd = bd;
+            claveSecreta = config.GetValue<string>("ApiSettings:Secreta");
         }
 
         public Usuario GetUsuario(int usuarioId)
@@ -33,10 +39,49 @@ namespace ApiPeliculas.Repositorio
             }
             return false;
         }
-
-        public async Task<UsuarioLoginRespuestaDto> Login(UsuarioRegistroDto usuarioLogindDto)
+        //public Task<UsuarioLoginRespuestaDto> Login(UsuarioLoginDto usuarioLogindDto)
+        //{
+        //    throw new NotImplementedException();
+        //}
+        public async Task<UsuarioLoginRespuestaDto>Login(UsuarioLoginDto usuarioLogindDto)
         {
-            throw new NotImplementedException();
+            var passwordEncriptado = obtenermd5(usuarioLogindDto.Password);
+            var usuario = _bd.Usuario.FirstOrDefault(
+                u => u.NombreUsuario.ToLower() == usuarioLogindDto.NombreUsuario.ToLower()
+                 && u.Password==passwordEncriptado
+                );
+            //validamos si  el usuario no existe con la convinacion de usuario y contrasena
+            if (usuario == null) {
+                return new UsuarioLoginRespuestaDto()
+                {
+                    Token = "",
+                    Usuario = null
+                };
+
+            }
+            //Aqui existe el usuario entonces podemos procesar el login
+            var manejadorToken = new JwtSecurityTokenHandler();
+            var key = Encoding.ASCII.GetBytes(claveSecreta);
+
+            var tokenDescriptor = new SecurityTokenDescriptor
+            {
+                Subject = new ClaimsIdentity(new Claim[]
+                {
+                    new Claim(ClaimTypes.Name, usuario.NombreUsuario.ToString()),
+                    new Claim(ClaimTypes.Role, usuario.Role)
+                }),
+                Expires = DateTime.UtcNow.AddDays(7),
+                SigningCredentials = new(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
+            };
+
+            var token = manejadorToken.CreateToken(tokenDescriptor);
+
+            UsuarioLoginRespuestaDto usuarioLoginRespuestaDto = new UsuarioLoginRespuestaDto()
+            {
+                Token = manejadorToken.WriteToken(token),
+                Usuario=usuario
+            };
+            return usuarioLoginRespuestaDto;
         }
 
         public async Task<Usuario> Registro(UsuarioRegistroDto usuarioRegistrodDto)
@@ -69,5 +114,7 @@ namespace ApiPeliculas.Repositorio
                 return resp;
             
         }
+
+
     }
 }
