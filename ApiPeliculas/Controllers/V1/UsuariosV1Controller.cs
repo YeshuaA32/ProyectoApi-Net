@@ -7,11 +7,11 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
-namespace ApiPeliculas.Controllers
+namespace ApiPeliculas.Controllers.V1
 {
     [Route("apiv{version:apiVersion}/usuarios")]
     [ApiController]
-    public class UsuariosController : ControllerBase
+    public class UsuariosV1Controller : ControllerBase
     {
         private readonly IUsuarioRepositorio _usRepo;
 
@@ -19,11 +19,11 @@ namespace ApiPeliculas.Controllers
 
         private readonly IMapper _mapper;
 
-        public UsuariosController(IUsuarioRepositorio usRepo, IMapper mapper)
+        public UsuariosV1Controller(IUsuarioRepositorio usRepo, IMapper mapper)
         {
             _usRepo = usRepo;
             _mapper = mapper;
-            this._respuestaAPI = new();
+            _respuestaAPI = new();
 
         }
 
@@ -126,7 +126,7 @@ namespace ApiPeliculas.Controllers
         {
             var respuestaLogin = await _usRepo.Login(usuarioLogindDto);
 
-            if (respuestaLogin.Usuario==null || string.IsNullOrEmpty(respuestaLogin.Token))
+            if (respuestaLogin.Usuario == null || string.IsNullOrEmpty(respuestaLogin.Token))
 
             {
 
@@ -140,13 +140,13 @@ namespace ApiPeliculas.Controllers
 
             }
 
-                _respuestaAPI.StatusCode = HttpStatusCode.OK;
+            _respuestaAPI.StatusCode = HttpStatusCode.OK;
 
-                _respuestaAPI.IsSuccess = true;
+            _respuestaAPI.IsSuccess = true;
 
-                _respuestaAPI.Result = respuestaLogin;
+            _respuestaAPI.Result = respuestaLogin;
 
-                return Ok(_respuestaAPI);
+            return Ok(_respuestaAPI);
 
 
 

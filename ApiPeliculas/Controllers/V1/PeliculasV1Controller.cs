@@ -6,18 +6,18 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
-namespace ApiPeliculas.Controllers
+namespace ApiPeliculas.Controllers.V1
 {
 
     [Route("api/v{version:apiVersion}/peliculas")]
     [ApiController]
-    public class PeliculasController : ControllerBase
+    public class PeliculasV1Controller : ControllerBase
     {
         private readonly IPeliculaRepositorio _pelRepo;
 
         private readonly IMapper _mapper;
 
-        public PeliculasController(IPeliculaRepositorio pelRepo, IMapper mapper)
+        public PeliculasV1Controller(IPeliculaRepositorio pelRepo, IMapper mapper)
         {
             _pelRepo = pelRepo;
             _mapper = mapper;
@@ -68,9 +68,9 @@ namespace ApiPeliculas.Controllers
 
 
 
-        [Authorize(Roles ="Admin")]
+        [Authorize(Roles = "Admin")]
         [HttpPost]
-        [ProducesResponseType(201, Type=typeof(PeliculaDto))]
+        [ProducesResponseType(201, Type = typeof(PeliculaDto))]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
@@ -159,7 +159,7 @@ namespace ApiPeliculas.Controllers
                 return NotFound();
             }
 
-            var pelicula   = _pelRepo.GetPelicula(peliculaId);
+            var pelicula = _pelRepo.GetPelicula(peliculaId);
 
             if (!_pelRepo.BorrarPelicula(pelicula))
             {
@@ -177,14 +177,14 @@ namespace ApiPeliculas.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public IActionResult GetPeliculasEnCategorias(int categoriaId)
         {
-           var listaPeliculas = _pelRepo.GetPeliculasEnCategoria(categoriaId);
+            var listaPeliculas = _pelRepo.GetPeliculasEnCategoria(categoriaId);
 
             if (listaPeliculas == null)
             {
                 return NotFound();
-                
+
             }
-            var itemPeliculas= new List<PeliculaDto>();
+            var itemPeliculas = new List<PeliculaDto>();
             foreach (var pelicula in listaPeliculas)
             {
                 itemPeliculas.Add(_mapper.Map<PeliculaDto>(pelicula));
@@ -205,14 +205,14 @@ namespace ApiPeliculas.Controllers
         {
             try
             {
-                var resultados= _pelRepo.BuscarPelicula(nombre);
+                var resultados = _pelRepo.BuscarPelicula(nombre);
                 if (resultados.Any())
                 {
                     return Ok(resultados);
                 }
                 return NotFound();
             }
-            catch (Exception ) 
+            catch (Exception)
             {
                 return StatusCode(StatusCodes.Status500InternalServerError, "Error recuperando datos");
             }

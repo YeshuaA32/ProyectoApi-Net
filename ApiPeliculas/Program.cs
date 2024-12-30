@@ -122,7 +122,45 @@ builder.Services.AddSwaggerGen(
             }
 
         });
-      }
+        options.SwaggerDoc("v1", new OpenApiInfo
+            {
+               Version = "v1.0",
+               Title="Peliculas Api V1",
+               Description="Api de Peliculas",
+               TermsOfService= new Uri("http://render2web.com/promociones"),
+               Contact = new OpenApiContact
+               {
+                   Name="render2web",
+                   Url= new Uri("http://render2web.com/promociones")
+               },
+               License = new OpenApiLicense
+               {
+                   Name= "Licencia Personal",
+                   Url=new Uri("http://render2web.com/promociones")
+               }
+            }
+        );
+
+
+        options.SwaggerDoc("v2", new OpenApiInfo
+        {
+            Version = "v2.0",
+            Title = "Peliculas Api Version 2",
+            Description = "Api de Peliculas 2",
+            TermsOfService = new Uri("http://render2web.com/promociones"),
+            Contact = new OpenApiContact
+            {
+                Name = "render2web",
+                Url = new Uri("http://render2web.com/promociones")
+            },
+            License = new OpenApiLicense
+            {
+                Name = "Licencia Personal",
+                Url = new Uri("http://render2web.com/promociones")
+            }
+        }
+       );
+    }
     );
 
 //SOPORTE PARA CORS
@@ -138,7 +176,11 @@ var app = builder.Build();
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
-    app.UseSwaggerUI();
+    app.UseSwaggerUI(opciones=>
+    {
+        opciones.SwaggerEndpoint("/swagger/v1/swagger.json","ApiPeliculasV1");
+        opciones.SwaggerEndpoint("/swagger/v2/swagger.json", "ApiPeliculasV2");
+    });
 }
 
 app.UseHttpsRedirection();

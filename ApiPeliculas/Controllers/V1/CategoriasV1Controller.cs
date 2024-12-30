@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
-namespace ApiPeliculas.Controllers
+namespace ApiPeliculas.Controllers.V1
 {
     [Authorize(Roles = "Admin")]
     //[ResponseCache(Duration =20)]
@@ -18,14 +18,13 @@ namespace ApiPeliculas.Controllers
     [ApiController]
     // [EnableCors("PoliticaCors")]
     [ApiVersion("1.0")]
-    [ApiVersion("2.0")]
-    public class CategoriasController : ControllerBase
+    public class CategoriasV1Controller : ControllerBase
     {
         private readonly ICategoriaRepositorio _ctRepo;
 
         private readonly IMapper _mapper;
 
-        public CategoriasController(ICategoriaRepositorio ctRepo, IMapper mapper)
+        public CategoriasV1Controller(ICategoriaRepositorio ctRepo, IMapper mapper)
         {
             _ctRepo = ctRepo;
             _mapper = mapper;
@@ -34,9 +33,9 @@ namespace ApiPeliculas.Controllers
 
         [AllowAnonymous]
         [HttpGet]
-        [MapToApiVersion("1.0")]
+        //  [MapToApiVersion("1.0")]
         //[ResponseCache(Duration = 20)]
-        [ResponseCache(CacheProfileName= "PorDefecto30Segundos")]
+        [ResponseCache(CacheProfileName = "PorDefecto30Segundos")]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         //[EnableCors("PoliticaCors")] // APLICAR POLITICA CORS
@@ -53,35 +52,7 @@ namespace ApiPeliculas.Controllers
             return Ok(listaCategoriasDto);
         }
 
-        [HttpGet]
-        [MapToApiVersion("2.0")]
-        public IEnumerable<string>Get()
-        {
-            return new string[] { "valor1", "valor2", "valor3" };
-        }
 
-        [AllowAnonymous]
-
-        [HttpGet("{categoriaId:int}", Name = "GetCategoria")]
-        //[ResponseCache(Duration = 40)]
-        //[ResponseCache(Location = ResponseCacheLocation.None, NoStore =true)]
-        [ResponseCache(CacheProfileName = "PorDefecto30Segundos")]
-
-        [ProducesResponseType(StatusCodes.Status403Forbidden)]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public IActionResult GetCategoria(int categoriaId)
-        {
-            var itemCategoria = _ctRepo.GetCategoria(categoriaId);
-
-            if (itemCategoria == null)
-            {
-                return NotFound();
-            }
-            var itemCategoriaDto = _mapper.Map<CategoriaDto>(itemCategoria);
-            return Ok(itemCategoriaDto);
-        }
 
 
 
@@ -98,7 +69,7 @@ namespace ApiPeliculas.Controllers
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
-                
+
             }
             if (CrearCategoriaDto == null)
             {
@@ -109,8 +80,8 @@ namespace ApiPeliculas.Controllers
                 ModelState.AddModelError("", "La categoria ya existe");
                 return StatusCode(404, ModelState);
             }
-            var categoria= _mapper.Map<Categoria>(CrearCategoriaDto);
-            if(!_ctRepo.CrearCategoria(categoria))
+            var categoria = _mapper.Map<Categoria>(CrearCategoriaDto);
+            if (!_ctRepo.CrearCategoria(categoria))
             {
                 ModelState.AddModelError("", $"Algo salio mal guardando el registro{categoria.Nombre}");
                 return StatusCode(404, ModelState);
@@ -126,14 +97,14 @@ namespace ApiPeliculas.Controllers
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        public IActionResult ActualizarPatchCategoria(int categoriaId ,[FromBody] CategoriaDto CategoriaDto)
+        public IActionResult ActualizarPatchCategoria(int categoriaId, [FromBody] CategoriaDto CategoriaDto)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
 
             }
-            if (CategoriaDto == null || categoriaId  != CategoriaDto.Id) 
+            if (CategoriaDto == null || categoriaId != CategoriaDto.Id)
             {
                 return BadRequest(ModelState);
             }
@@ -174,7 +145,7 @@ namespace ApiPeliculas.Controllers
             }
 
             var categoriaExistente = _ctRepo.GetCategoria(categoriaId);
-            if (categoriaExistente == null) 
+            if (categoriaExistente == null)
             {
                 return NotFound($"No se encontro la categoria con Id {categoriaId}");
             }
@@ -200,14 +171,14 @@ namespace ApiPeliculas.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public IActionResult BorrarCategoria(int categoriaId)
         {
-         
 
-            if (!_ctRepo.ExisteCategoria (categoriaId))
+
+            if (!_ctRepo.ExisteCategoria(categoriaId))
             {
                 return NotFound();
             }
 
-            var categoria = _ctRepo.GetCategoria (categoriaId);
+            var categoria = _ctRepo.GetCategoria(categoriaId);
 
             if (!_ctRepo.BorrarCategoria(categoria))
             {
