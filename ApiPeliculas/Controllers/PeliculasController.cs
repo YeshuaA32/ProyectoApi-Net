@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace ApiPeliculas.Controllers
 {
 
-    [Route("api/peliculas")]
+    [Route("api/v{version:apiVersion}/peliculas")]
     [ApiController]
     public class PeliculasController : ControllerBase
     {
@@ -26,6 +26,8 @@ namespace ApiPeliculas.Controllers
 
         [AllowAnonymous]
         [HttpGet]
+        [ResponseCache(CacheProfileName = "PorDefecto30Segundos")]
+
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         public IActionResult GetPeliculas()
@@ -43,6 +45,8 @@ namespace ApiPeliculas.Controllers
 
 
         [AllowAnonymous]
+        [ResponseCache(CacheProfileName = "PorDefecto30Segundos")]
+
         [HttpGet("{peliculaId:int}", Name = "GetPelicula")]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status200OK)]

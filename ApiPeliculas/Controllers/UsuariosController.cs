@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace ApiPeliculas.Controllers
 {
-    [Route("api/usuarios")]
+    [Route("apiv{version:apiVersion}/usuarios")]
     [ApiController]
     public class UsuariosController : ControllerBase
     {

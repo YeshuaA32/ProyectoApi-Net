@@ -3,10 +3,13 @@ using ApiPeliculas.Data;
 using ApiPeliculas.PeliculasMapper;
 using ApiPeliculas.Repositorio;
 using ApiPeliculas.Repositorio.IRepositorio;
+using Asp.Versioning;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using XAct;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -14,6 +17,9 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<ApplicationDbContext>(opciones =>
             opciones.UseSqlServer(builder.Configuration.GetConnectionString("ConexionSql")));
 
+//Soporte para cache
+builder.Services.AddResponseCaching(
+);
 
 //agregamos lso respositorios
 builder.Services.AddScoped<ICategoriaRepositorio, CategoriaRepositorio>();
@@ -21,6 +27,31 @@ builder.Services.AddScoped<IPeliculaRepositorio, PeliculaRepositorio>();
 builder.Services.AddScoped<IUsuarioRepositorio, UsuarioRepositorio>();
 
 var key = builder.Configuration.GetValue<string>("ApiSettings:Secreta");
+
+//Soporte para mantenimiento
+
+var apiVersioningBuilder = builder.Services.AddApiVersioning(opcion =>
+{
+opcion.AssumeDefaultVersionWhenUnspecified = true;
+opcion.DefaultApiVersion = new ApiVersion(1, 0);
+opcion.ReportApiVersions = true;
+//opcion.ApiVersionReader = ApiVersionReader.Combine(
+//            new QueryStringApiVersionReader("Api-version")
+//            //?api-version=1.0
+//            //new HeaderApiVersionReader(X-Version),
+//            //new MedialTypeApiVersionReader("ver));
+//            );
+    }
+);
+
+apiVersioningBuilder.AddApiExplorer(
+        opciones =>
+        {
+            opciones.GroupNameFormat = "'v'VVV";
+            opciones.SubstituteApiVersionInUrl= true;
+
+        }
+     );
 
 //agregamos el automapper
 builder.Services.AddAutoMapper(typeof(PeliculasMapper));
@@ -51,7 +82,12 @@ builder.Services.AddAuthentication(
     );
 
 
-builder.Services.AddControllers();
+builder.Services.AddControllers(
+    opcion=>
+        {
+            opcion.CacheProfiles.Add("PorDefecto30Segundos", new CacheProfile() { Duration =30});
+        }
+    );
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(

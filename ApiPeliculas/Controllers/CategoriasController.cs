@@ -1,6 +1,7 @@
 ﻿using ApiPeliculas.Modelos;
 using ApiPeliculas.Modelos.Dtos;
 using ApiPeliculas.Repositorio.IRepositorio;
+using Asp.Versioning;
 using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
@@ -10,10 +11,14 @@ using Microsoft.AspNetCore.Mvc;
 namespace ApiPeliculas.Controllers
 {
     [Authorize(Roles = "Admin")]
-
-    [Route("api/[controller]")]
+    //[ResponseCache(Duration =20)]
+    // [ResponseCache(CacheProfileName= "PorDefecto30Segundos")]
+    //[Route("api/[controller]")]
+    [Route("api/v{version:apiVersion}/categorias")]
     [ApiController]
-   // [EnableCors("PoliticaCors")]
+    // [EnableCors("PoliticaCors")]
+    [ApiVersion("1.0")]
+    [ApiVersion("2.0")]
     public class CategoriasController : ControllerBase
     {
         private readonly ICategoriaRepositorio _ctRepo;
@@ -29,6 +34,9 @@ namespace ApiPeliculas.Controllers
 
         [AllowAnonymous]
         [HttpGet]
+        [MapToApiVersion("1.0")]
+        //[ResponseCache(Duration = 20)]
+        [ResponseCache(CacheProfileName= "PorDefecto30Segundos")]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         //[EnableCors("PoliticaCors")] // APLICAR POLITICA CORS
@@ -45,11 +53,20 @@ namespace ApiPeliculas.Controllers
             return Ok(listaCategoriasDto);
         }
 
-
+        [HttpGet]
+        [MapToApiVersion("2.0")]
+        public IEnumerable<string>Get()
+        {
+            return new string[] { "valor1", "valor2", "valor3" };
+        }
 
         [AllowAnonymous]
 
         [HttpGet("{categoriaId:int}", Name = "GetCategoria")]
+        //[ResponseCache(Duration = 40)]
+        //[ResponseCache(Location = ResponseCacheLocation.None, NoStore =true)]
+        [ResponseCache(CacheProfileName = "PorDefecto30Segundos")]
+
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
