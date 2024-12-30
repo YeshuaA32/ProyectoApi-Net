@@ -18,7 +18,7 @@ namespace ApiPeliculas.Controllers.V2
     [ApiController]
     // [EnableCors("PoliticaCors")]
     [ApiVersion("2.0")]
-    [Obsolete("Este endpoint esta obsoleta, por favor utilice la version 1.0")]
+  //  [Obsolete("Este endpoint esta obsoleta, por favor utilice la version 1.0")]
 
     public class CategoriasController : ControllerBase
     {

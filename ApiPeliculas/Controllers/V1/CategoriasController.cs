@@ -33,7 +33,7 @@ namespace ApiPeliculas.Controllers.V1
 
         }
 
-        [HttpGet("GetString")]
+        [HttpGet("Gegit ptString")]
         [Obsolete("Esta version del controlador esta obsoleta utilce la version 2")]
         [AllowAnonymous]
 
