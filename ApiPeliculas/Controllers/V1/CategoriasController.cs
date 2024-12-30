@@ -18,18 +18,31 @@ namespace ApiPeliculas.Controllers.V1
     [ApiController]
     // [EnableCors("PoliticaCors")]
     [ApiVersion("1.0")]
-    public class CategoriasV1Controller : ControllerBase
+    // [ApiVersion("1.0", Deprecated = true)]
+    //[Obsolete("Esta version del controlador esta obsoleta")]
+    public class CategoriasController : ControllerBase
     {
         private readonly ICategoriaRepositorio _ctRepo;
 
         private readonly IMapper _mapper;
 
-        public CategoriasV1Controller(ICategoriaRepositorio ctRepo, IMapper mapper)
+        public CategoriasController(ICategoriaRepositorio ctRepo, IMapper mapper)
         {
             _ctRepo = ctRepo;
             _mapper = mapper;
 
         }
+
+        [HttpGet("GetString")]
+        [Obsolete("Esta version del controlador esta obsoleta utilce la version 2")]
+        [AllowAnonymous]
+
+        public IEnumerable<string> Get()
+        {
+            return new string[] { "valor1", "valor2", "valor3" };
+        }
+
+
 
         [AllowAnonymous]
         [HttpGet]
