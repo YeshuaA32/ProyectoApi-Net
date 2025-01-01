@@ -22,6 +22,8 @@ namespace ApiPeliculas.Controllers
 
         private readonly IMapper _mapper;
 
+       // protected RespuestaAPI _respuestaApi;
+
         public UsuariosController(IUsuarioRepositorio usRepo, IMapper mapper)
         {
             _usRepo = usRepo;
@@ -51,12 +53,12 @@ namespace ApiPeliculas.Controllers
 
         [Authorize(Roles = "Admin")]
 
-        [HttpGet("{usuarioId:int}", Name = "GetUsuario")]
+        [HttpGet("{usuarioId}", Name = "GetUsuario")]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public IActionResult GetUsuario(int usuarioId)
+        public IActionResult GetUsuario(string usuarioId)
         {
             var itemUsuario = _usRepo.GetUsuario(usuarioId);
 
@@ -112,9 +114,9 @@ namespace ApiPeliculas.Controllers
             }
 
 
-
-            return CreatedAtRoute("GetUsuario", new { usuarioId = usuario.Id }, usuario);
-
+            _respuestaAPI.StatusCode = HttpStatusCode.OK;
+            _respuestaAPI.IsSuccess = true;
+            return Ok(_respuestaAPI);
 
 
         }

@@ -1,10 +1,12 @@
 using System.Text;
 using ApiPeliculas.Data;
+using ApiPeliculas.Modelos;
 using ApiPeliculas.PeliculasMapper;
 using ApiPeliculas.Repositorio;
 using ApiPeliculas.Repositorio.IRepositorio;
 using Asp.Versioning;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -30,6 +32,11 @@ var key = builder.Configuration.GetValue<string>("ApiSettings:Secreta");
 
 //Soporte para mantenimiento
 
+//Soporte para autenticacion con  .Net Identity
+builder.Services.AddIdentity<AppUsuario, IdentityRole>().AddEntityFrameworkStores<ApplicationDbContext>();
+
+
+//Soporte para cache
 var apiVersioningBuilder = builder.Services.AddApiVersioning(opcion =>
 {
 opcion.AssumeDefaultVersionWhenUnspecified = true;
