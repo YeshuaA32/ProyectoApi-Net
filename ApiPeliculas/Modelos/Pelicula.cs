@@ -17,7 +17,7 @@ namespace ApiPeliculas.Modelos
             Siete, Trece, Dieciseis, Dieciocho
         }
         public TipoClasificacion Clasificacion { get; set; }
-        public DateTime FechaCreacion { get; set; }
+        public DateTime? FechaCreacion { get; set; }
 
         //Relacion con Categoria
         public int categoriaId { get; set; }
