@@ -75,7 +75,7 @@ namespace ApiPeliculas.Controllers.V1
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        public IActionResult CrearPelicula([FromBody] CrearPeliculaDto crearPeliculaDto)
+        public IActionResult CrearPelicula([FromForm] CrearPeliculaDto crearPeliculaDto)
         {
             if (!ModelState.IsValid)
             {
@@ -92,11 +92,41 @@ namespace ApiPeliculas.Controllers.V1
                 return StatusCode(404, ModelState);
             }
             var pelicula = _mapper.Map<Pelicula>(crearPeliculaDto);
-            if (!_pelRepo.CrearPelicula(pelicula))
+            //if (!_pelRepo.CrearPelicula(pelicula))
+            //{
+            //    ModelState.AddModelError("", $"Algo salio mal guardando el registro{pelicula.Nombre}");
+            //    return StatusCode(404, ModelState);
+            //}
+
+            //Subida de archivos
+
+            if (crearPeliculaDto.Imagen != null)
             {
-                ModelState.AddModelError("", $"Algo salio mal guardando el registro{pelicula.Nombre}");
-                return StatusCode(404, ModelState);
+                string nombreArchivo = pelicula.id + System.Guid.NewGuid().ToString() + Path.GetExtension(crearPeliculaDto.Imagen.FileName);
+                string rutaArchivo = @"wwwroot\ImagenesPeliculas\" + nombreArchivo;
+
+                var ubicacionDirectorio = Path.Combine(Directory.GetCurrentDirectory(), rutaArchivo);
+
+                FileInfo file= new FileInfo(ubicacionDirectorio);
+                if (file.Exists) 
+                { 
+                    file.Delete();
+                }
+
+                using (var fileStream = new FileStream(ubicacionDirectorio, FileMode.Create))
+                {
+                   crearPeliculaDto.Imagen.CopyTo(fileStream);
+                }
+                var baseUrl = $"{HttpContext.Request.Scheme}://{HttpContext.Request.Host.Value}{HttpContext.Request.PathBase.Value}";
+                pelicula.RutaImagen = baseUrl + "/ImagenesPeliculas/" + nombreArchivo;
+                pelicula.RutaLocalImagen = rutaArchivo;
             }
+            else
+            {
+                pelicula.RutaImagen = "https://placehold.co/600/400";
+            }
+
+            _pelRepo.CrearPelicula(pelicula);
             return CreatedAtRoute("GetPelicula", new { peliculaId = pelicula.id }, pelicula);
         }
 
