@@ -24,25 +24,66 @@ namespace ApiPeliculas.Controllers.V1
 
         }
 
+        //V1
+
+        //[AllowAnonymous]
+        //[HttpGet]
+        //[ResponseCache(CacheProfileName = "PorDefecto30Segundos")]
+
+        //[ProducesResponseType(StatusCodes.Status403Forbidden)]
+        //[ProducesResponseType(StatusCodes.Status200OK)]
+        //public IActionResult GetPeliculas()
+        //{
+        //    var listaPeliculas = _pelRepo.GetPeliculas();
+
+        //    var listaPeliculasDto = new List<PeliculaDto>();
+
+        //    foreach (var lista in listaPeliculas)
+        //    {
+        //        listaPeliculasDto.Add(_mapper.Map<PeliculaDto>(lista));
+        //    }
+        //    return Ok(listaPeliculasDto);
+        //}
+
+
+
+        //V2  con paginacion
         [AllowAnonymous]
         [HttpGet]
         [ResponseCache(CacheProfileName = "PorDefecto30Segundos")]
 
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public IActionResult GetPeliculas()
+        public IActionResult GetPeliculas([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
         {
-            var listaPeliculas = _pelRepo.GetPeliculas();
-
-            var listaPeliculasDto = new List<PeliculaDto>();
-
-            foreach (var lista in listaPeliculas)
+            try
             {
-                listaPeliculasDto.Add(_mapper.Map<PeliculaDto>(lista));
-            }
-            return Ok(listaPeliculasDto);
-        }
+                var totalPeliculas = _pelRepo.GetoTotalPeliculas();
+                var peliculas = _pelRepo.GetPeliculas(pageNumber, pageSize);
 
+                if (peliculas == null || !peliculas.Any())
+                {
+                    return NotFound("No se encotraron peliculas");
+                }
+                var peliculasDto = peliculas.Select(p => _mapper.Map<PeliculaDto>(p)).ToList();
+                var response = new
+                {
+                    PageNumber = pageNumber,
+                    PageSize = pageSize,
+                    TotalPages = Math.Ceiling(totalPeliculas / (double)pageSize),
+                    TotalItems = totalPeliculas,
+                    Items = peliculasDto
+                };
+                return Ok(response);
+            }
+            catch (Exception )
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "Error recuperando datos de la aplicacion");
+
+            }
+
+
+        }
 
         [AllowAnonymous]
         [ResponseCache(CacheProfileName = "PorDefecto30Segundos")]

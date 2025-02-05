@@ -9,6 +9,7 @@ namespace ApiPeliculas.Repositorio.IRepositorio
 
         //V2
         ICollection<Pelicula> GetPeliculas(int pageNumber, int pageSize);
+        int GetoTotalPeliculas();
         ICollection<Pelicula> GetPeliculasEnCategoria(int catId);
         IEnumerable<Pelicula> BuscarPelicula(string nombre);
         Pelicula GetPelicula(int peliculaId);
@@ -18,5 +19,6 @@ namespace ApiPeliculas.Repositorio.IRepositorio
         bool ActualizarPelicula(Pelicula pelicula);
         bool BorrarPelicula(Pelicula pelicula);
         bool Guardar();
+       // IEnumerable<Pelicula> GetPeliculas();
     }
 }

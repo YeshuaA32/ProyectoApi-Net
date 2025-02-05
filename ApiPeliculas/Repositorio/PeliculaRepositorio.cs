@@ -65,7 +65,11 @@ namespace ApiPeliculas.Repositorio
             return valor;
         }
 
-      
+        public int GetoTotalPeliculas()
+        {
+            return _bd.Pelicula.Count();
+        }
+
         public Pelicula GetPelicula(int peliculaId)
         {
             return _bd.Pelicula.FirstOrDefault(c => c.id == peliculaId);
